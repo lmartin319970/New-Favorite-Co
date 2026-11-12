@@ -1,0 +1,21 @@
+---
+import '../styles/global.css';
+const {title='NewFavorite — Find your new favorite.',description='Explore unfamiliar ingredients, cooking techniques, and recipes worth trying.',image='/images/hero.png',type='website'}=Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const absoluteImage = new URL(image, Astro.site);
+const ga = import.meta.env.PUBLIC_GA_ID;
+---
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>{title}</title><meta name="description" content={description}/><link rel="canonical" href={canonical}/>
+<meta property="og:type" content={type}/><meta property="og:title" content={title}/><meta property="og:description" content={description}/><meta property="og:url" content={canonical}/><meta property="og:image" content={absoluteImage}/>
+<meta name="twitter:card" content="summary_large_image"/><meta name="theme-color" content="#080808"/>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+{ga && <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${ga}`}></script>}
+{ga && <script is:inline define:vars={{ga}}>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config',ga);</script>}
+</head><body>
+<header class="site-header"><div class="wrap header-inner"><a class="brand" href="/" aria-label="NewFavorite home">newfavorite</a><nav aria-label="Main navigation"><a href="/recipes/">Recipes</a><a href="/discover/">Discover</a><a href="/about/">About</a></nav><a class="header-subscribe" href="/#newsletter">Get the newsletter</a></div></header>
+<main><slot/></main>
+<footer class="footer"><div class="wrap footer-inner"><div><a class="brand" href="/">newfavorite</a><p>Find something you didn't know you'd love.</p></div><div><a href="/recipes/">Recipes</a><a href="/discover/">Discover</a><a href="/about/">About</a><a href="/privacy/">Privacy</a></div><small>© {new Date().getFullYear()} NewFavorite · Independent cooking & discovery</small></div></footer>
+<script>document.addEventListener('click',e=>{const el=(e.target as HTMLElement).closest('[data-track]');if(el && typeof (window as any).gtag==='function')(window as any).gtag('event',el.getAttribute('data-track'),{item_id:el.getAttribute('data-item')||''})})</script>
+</body></html>

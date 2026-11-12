@@ -1,0 +1,16 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  return (await getCollection('discover')).map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+---
+<Base title={`${d.title} | NewFavorite`} description={d.description} image={d.image||'/images/hero.png'} type="article"><article class="wrap article"><a class="back-link" href="/discover/">← Discover</a><p class="eyebrow">DISCOVER</p><h1>{d.title}</h1><p class="lede">{d.description}</p><img class="article-hero" src={d.image||'/images/hero.png'} alt={d.imageAlt||d.title} fetchpriority="high"/><div class="prose"><Content/></div></article></Base>

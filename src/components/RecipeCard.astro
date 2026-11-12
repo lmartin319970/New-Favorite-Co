@@ -1,0 +1,4 @@
+---
+const {recipe}=Astro.props;
+---
+<a class="article-card" href={`/recipes/${recipe.id}/`}><div class="card-photo"><img src={recipe.data.image || '/images/hero.png'} alt={recipe.data.imageAlt || recipe.data.title} loading="lazy" decoding="async"/></div><div class="eyebrow">{recipe.data.category} <span>·</span> {recipe.data.prepMinutes+recipe.data.cookMinutes} min</div><h3>{recipe.data.title}</h3><p>{recipe.data.description}</p></a>

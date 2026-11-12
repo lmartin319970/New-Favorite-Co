@@ -1,0 +1,68 @@
+---
+import Base from '../../layouts/Base.astro';
+import Engagement from '../../components/Engagement.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  return (await getCollection('recipes')).map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+const url = new URL(`/recipes/${entry.id}/`, Astro.site).href;
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Recipe',
+  name: d.title,
+  description: d.description,
+  image: d.image ? [new URL(d.image, Astro.site).href] : undefined,
+  datePublished: d.date.toISOString().slice(0, 10),
+  prepTime: `PT${d.prepMinutes}M`,
+  cookTime: `PT${d.cookMinutes}M`,
+  recipeYield: `${d.servings} servings`,
+  recipeIngredient: d.ingredients.map((i: any) => `${i.amount} ${i.name}`),
+  recipeInstructions: d.instructions.map((text: string) => ({
+    '@type': 'HowToStep',
+    text,
+  })),
+  url,
+};
+---
+<Base title={`${d.title} | NewFavorite`} description={d.description} image={d.image || '/images/hero.png'} type="article">
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <article class="wrap article">
+    <a class="back-link" href="/recipes/">← All recipes</a>
+    <p class="eyebrow">{d.category} · {d.difficulty}</p>
+    <h1>{d.title}</h1>
+    <p class="lede">{d.description}</p>
+    <img class="article-hero" src={d.image || '/images/hero.png'} alt={d.imageAlt || d.title} fetchpriority="high" />
+    <div class="recipe-meta">
+      <span><strong>{d.prepMinutes}</strong> min prep</span>
+      <span><strong>{d.cookMinutes}</strong> min cook</span>
+      <span><strong>{d.servings}</strong> servings</span>
+      <a href="#recipe">Jump to recipe ↓</a>
+    </div>
+    {d.discovery && <aside class="discovery-note"><p class="eyebrow">WHAT'S NEW HERE</p><p>{d.discovery}</p></aside>}
+    <div class="prose"><Content /></div>
+    <div id="recipe" class="recipe-panel">
+      <h2>Make it yourself</h2>
+      <div class="recipe-columns">
+        <section>
+          <h3>Ingredients</h3>
+          <ul class="ingredient-list">
+            {d.ingredients.map((i: any) => <li><label><input type="checkbox" /><span>{i.amount} {i.name}</span></label></li>)}
+          </ul>
+        </section>
+        <section>
+          <h3>Method</h3>
+          <ol class="steps">{d.instructions.map((step: string) => <li>{step}</li>)}</ol>
+        </section>
+      </div>
+    </div>
+    <Engagement slug={entry.id} title={d.title} />
+  </article>
+</Base>

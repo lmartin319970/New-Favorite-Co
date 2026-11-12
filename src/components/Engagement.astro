@@ -1,0 +1,206 @@
+
+---
+interface Props {
+  slug: string;
+  title: string;
+}
+
+const { slug, title } = Astro.props;
+---
+
+<div class="engagement" data-slug={slug} data-title={title}>
+  <button
+    type="button"
+    class="outline-btn"
+    data-save
+    aria-pressed="false"
+  >
+    ♡ Save recipe
+  </button>
+
+  <button
+    type="button"
+    class="outline-btn"
+    data-tried
+    aria-pressed="false"
+  >
+    ✓ I tried it
+  </button>
+
+  <button
+    type="button"
+    class="outline-btn"
+    data-share
+  >
+    ↗ Share
+  </button>
+
+  <button
+    type="button"
+    class="outline-btn"
+    data-print
+  >
+    ⎙ Print
+  </button>
+
+  <p
+    class="engagement-status"
+    role="status"
+    aria-live="polite"
+  ></p>
+
+  <div class="feedback" hidden>
+    <label for="recipe-feedback">
+      What would you change or recommend?
+    </label>
+
+    <textarea
+      id="recipe-feedback"
+      rows="3"
+      maxlength="800"
+      placeholder="Your notes (optional)"
+    ></textarea>
+
+    <button type="button" data-feedback>
+      Send feedback by email ↗
+    </button>
+
+    <p class="muted">
+      Feedback opens your email app; it isn't published on the site.
+    </p>
+  </div>
+</div>
+
+<script>
+  // Read saved recipe data from local storage
+  const read = (key: string): string[] => {
+    try {
+      const value = JSON.parse(localStorage.getItem(key) || '[]');
+      return Array.isArray(value)
+        ? value.filter((item): item is string => typeof item === 'string')
+        : [];
+    } catch {
+      return [];
+    }
+  };
+
+  // Write recipe data to local storage
+  const write = (key: string, val: string[]): boolean => {
+    try {
+      localStorage.setItem(key, JSON.stringify(val));
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  // Initialize engagement controls
+  for (const root of document.querySelectorAll<HTMLElement>('.engagement')) {
+    const slug = root.dataset.slug || '';
+    const title = root.dataset.title || '';
+
+    const save = root.querySelector<HTMLButtonElement>('[data-save]')!;
+    const tried = root.querySelector<HTMLButtonElement>('[data-tried]')!;
+    const share = root.querySelector<HTMLButtonElement>('[data-share]');
+    const print = root.querySelector<HTMLButtonElement>('[data-print]');
+    const feedbackButton = root.querySelector<HTMLButtonElement>('[data-feedback]');
+
+    const status = root.querySelector<HTMLElement>('.engagement-status')!;
+    const feedback = root.querySelector<HTMLElement>('.feedback')!;
+
+    // Update button states
+    const update = () => {
+      const saved = read('nf-saved').includes(slug);
+      const made = read('nf-tried').includes(slug);
+
+      save.textContent = saved ? '♥ Saved' : '♡ Save recipe';
+      save.setAttribute('aria-pressed', String(saved));
+
+      tried.textContent = made ? '✓ Tried it' : '✓ I tried it';
+      tried.setAttribute('aria-pressed', String(made));
+
+      feedback.hidden = !made;
+    };
+
+    update();
+
+    // Toggle saved or tried state
+    const toggle = (key: string, event: string) => {
+      const values = read(key);
+      const exists = values.includes(slug);
+
+      const next = exists
+        ? values.filter((x) => x !== slug)
+        : [...values, slug];
+
+      if (write(key, next)) {
+        status.textContent = exists
+          ? 'Removed.'
+          : 'Saved on this device.';
+
+        // Optional Google Analytics tracking
+        (window as any).gtag?.('event', event, {
+          recipe: slug,
+        });
+      } else {
+        status.textContent = 'Your browser blocked local storage.';
+      }
+
+      update();
+    };
+
+    // Save recipe
+    save.addEventListener('click', () => {
+      toggle('nf-saved', 'recipe_saved');
+    });
+
+    // Mark recipe as tried
+    tried.addEventListener('click', () => {
+      toggle('nf-tried', 'recipe_tried');
+    });
+
+    // Share recipe
+    share?.addEventListener('click', async () => {
+      try {
+        if (navigator.share) {
+          await navigator.share({
+            title,
+            url: location.href,
+          });
+        } else {
+          await navigator.clipboard.writeText(location.href);
+          status.textContent = 'Link copied.';
+        }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+
+        status.textContent = 'Copy this page URL to share.';
+      }
+    });
+
+    // Print recipe
+    print?.addEventListener('click', () => {
+      window.print();
+    });
+
+    // Send feedback by email
+    feedbackButton?.addEventListener('click', () => {
+      const body = (
+        root.querySelector<HTMLTextAreaElement>('textarea')?.value || ''
+      ).trim();
+
+      const subject = encodeURIComponent(
+        'Recipe feedback: ' + title
+      );
+
+      const message = encodeURIComponent(
+        body + '\n\nRecipe: ' + location.href
+      );
+
+      location.href =
+        `mailto:hello@newfavorite.co?subject=${subject}&body=${message}`;
+    });
+  }
+</script>
