@@ -18,7 +18,7 @@ npm run build
 npm run preview
 ```
 
-`npm run build` runs Astro's type checks before generating the static site in `dist/`. For local newsletter configuration, copy `.env.example` to `.env` and set `PUBLIC_NEWSLETTER_ACTION` to your provider's form endpoint.
+`npm run build` runs Astro's type checks before generating the static site in `dist/`. Newsletter signup currently displays `(Coming soon)`; no email form is rendered.
 
 ## Publishing with GitHub Actions
 
@@ -47,6 +47,9 @@ The container must have an Analytics destination configured and published for vi
 
 ## Content
 
+- **Chicken and Cornbread Stuffing** is dated November 12, 2026 and appears in the homepage banner. Its source is `src/content/recipes/chicken-and-cornbread-stuffing.md`; the document's "Yap" section is intentionally omitted.
+- To add its photo, save it as `public/images/chicken-and-cornbread-stuffing.jpg`, then uncomment the `image` and `imageAlt` lines in that recipe's frontmatter. Use an actual JPEG file (or update the filename and `image` path to match your file type). Until then, the site uses the existing fallback image. Commit and push the photo and recipe changes together.
+- The homepage banner uses the newest recipe with `featured: true` (or the newest recipe if none are featured). The Featured recipes section excludes the banner recipe, prioritizes other featured recipes, and fills remaining places with recent recipes. Recent recipes include all recipes sorted by date.
 - `src/content/recipes/*.md`: structured recipe metadata and editorial body.
 - `src/content/discover/*.md`: ingredient and technique articles.
 - `src/content/journal/*.md`: casual cooking posts.
@@ -59,7 +62,7 @@ The container must have an Analytics destination configured and published for vi
 - **Surprise Me** navigates to a random recipe.
 - **Save recipe** and **I tried it** persist per browser using `localStorage`. They do not sync across devices and do not produce aggregated counts.
 - **I tried it** includes optional feedback via `mailto:`; it is not a public review database or star rating system. To add actual public ratings, comments, moderation, and aggregated stats, integrate a backend such as Supabase and implement spam controls, authentication, and rate limits.
-- **Newsletter** uses a configurable provider form action. Confirm the provider's exact form field names, embed method, consent language, and anti-spam controls. The default field name is `email`.
+- **Newsletter** currently displays `(Coming soon)` instead of an email form. Setting `PUBLIC_NEWSLETTER_ACTION` will not enable signup until the form is restored in `src/components/Newsletter.astro`.
 - **Analytics** is managed through Google Tag Manager container `GTM-W2W2FB9N` in `src/layouts/Base.astro`.
 - **Recipe structured data** is included; only publish accurate tested recipes, images, and cooking times. No fake ratings are emitted.
 - Add a sitemap integration (e.g. `@astrojs/sitemap`) before launch; then update `robots.txt` with the generated sitemap URL.

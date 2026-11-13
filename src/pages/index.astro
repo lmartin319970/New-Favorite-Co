@@ -1,9 +1,668 @@
 ---
-import Base from '../layouts/Base.astro';import Newsletter from '../components/Newsletter.astro';import RecipeCard from '../components/RecipeCard.astro';import {getCollection} from 'astro:content';
-const recipes=(await getCollection('recipes')).sort((a,b)=>b.data.date.valueOf()-a.data.date.valueOf());const discover=[...(await getCollection('discover')).map(entry=>({entry,href:`/discover/${entry.id}/`})),...(await getCollection('journal')).map(entry=>({entry,href:`/journal/${entry.id}/`}))].sort((a,b)=>b.entry.data.date.valueOf()-a.entry.data.date.valueOf());
+import Base from '../layouts/Base.astro';
+import Newsletter from '../components/Newsletter.astro';
+import { getCollection } from 'astro:content';
+
+const recipes = (await getCollection('recipes')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const journalEntries = [
+  ...(await getCollection('discover')).map((entry) => ({
+    entry,
+    href: `/discover/${entry.id}/`,
+  })),
+  ...(await getCollection('journal')).map((entry) => ({
+    entry,
+    href: `/journal/${entry.id}/`,
+  })),
+].sort((a, b) => b.entry.data.date.valueOf() - a.entry.data.date.valueOf());
+
+const mainRecipe = recipes.find((recipe) => recipe.data.featured) ?? recipes[0];
+const otherRecipes = recipes.filter((recipe) => recipe.id !== mainRecipe?.id);
+const featuredRecipes = [
+  ...otherRecipes.filter((recipe) => recipe.data.featured),
+  ...otherRecipes.filter((recipe) => !recipe.data.featured),
+].slice(0, 2);
+const featuredRecipeDescriptions: Record<string, string> = {
+  'miso-butter-salmon': 'Savory miso-butter salmon.',
+  'lemon-garlic-chickpeas': 'Lemony garlic chickpeas.',
+  'braised-pork-sliders': 'Tangy pulled-pork sliders.',
+};
 ---
-<Base><section class="hero"><img class="hero-photo" src="/images/hero.png" alt="A table of colorful home-cooked food" fetchpriority="high"/><div class="hero-shade"></div><div class="wrap hero-content"><p class="eyebrow">FOOD & COOKING</p><h1>Find your next<br/>favorite.</h1><p>Explore tested recipes, ingredient guides, and practical cooking techniques.</p><a class="btn" href="/recipes/">Browse recipes <span aria-hidden="true">↗</span></a></div></section>
-<div class="wrap page-sections">
-<section class="home-recipes"><div class="section-head"><div><p class="eyebrow">FROM THE KITCHEN</p><h2>Featured recipes</h2></div><a class="text-link" href="/recipes/">All recipes <span aria-hidden="true">↗</span></a></div><div class="featured-recipes">{recipes.slice(0,2).map((recipe,index)=><a class="feature-recipe" href={`/recipes/${recipe.id}/`}><img src={recipe.data.image||'/images/hero.png'} alt={recipe.data.imageAlt||recipe.data.title} loading="lazy" decoding="async"/><div class="feature-recipe-copy"><p class="eyebrow">{index===0?'IN FOCUS':'ALSO WORTH A TRY'} · {recipe.data.category}</p><h3>{recipe.data.title}</h3><p>{recipe.data.description}</p></div></a>)}</div><div class="home-recent"><div class="recent-recipes-head"><h3>Recent recipes</h3><a class="text-link" href="/recipes/">View all <span aria-hidden="true">↗</span></a></div><div class="card-grid home-recent-grid">{recipes.slice(0,3).map(recipe=><RecipeCard recipe={recipe}/>)}</div></div><div class="surprise-strip" role="group" aria-label="Recipe suggestion"><span class="eyebrow">NEED AN IDEA?</span><span class="surprise-copy">Get a recipe suggestion</span><button class="surprise-button" id="surprise">Surprise me <span aria-hidden="true">↗</span></button></div></section>
-<section><div class="section-head"><div><p class="eyebrow">INGREDIENTS, TECHNIQUES & STORIES</p><h2>Discover</h2></div><a class="text-link" href="/discover/">All Discover articles <span aria-hidden="true">↗</span></a></div><div class="editorial-grid">{discover.slice(0,2).map(({entry,href})=><a class="editorial-card" href={href}><img src={entry.data.image||'/images/hero.png'} alt={entry.data.imageAlt||entry.data.title} loading="lazy" decoding="async"/><div><p class="eyebrow">DISCOVER · {entry.data.date.toLocaleDateString('en-US',{month:'long',year:'numeric'})}</p><h3>{entry.data.title}</h3><p>{entry.data.description}</p></div></a>)}</div></section>
-<Newsletter/></div><script define:vars={{urls:recipes.map(x=>`/recipes/${x.id}/`)}}>document.getElementById('surprise')?.addEventListener('click',()=>{if(urls.length)location.href=urls[Math.floor(Math.random()*urls.length)]})</script></Base>
+
+<Base>
+  <div class="home-page">
+    <div class="wrap home-content">
+      <header class="home-intro">
+        <p class="eyebrow">WELCOME TO NEWFAVORITE</p>
+        <h1>Learn recipes, new and familiar.</h1>
+      </header>
+
+      <div class="home-two-column-row home-feature-row">
+        <section class="home-featured-main" aria-label="Featured recipes">
+          {
+            mainRecipe && (
+              <a class="home-featured-primary" href={`/recipes/${mainRecipe.id}/`}>
+                <div class="home-featured-photo">
+                  <img
+                    src={mainRecipe.data.image || '/images/hero.png'}
+                    alt={mainRecipe.data.imageAlt || mainRecipe.data.title}
+                    loading="eager"
+                    fetchpriority="high"
+                    decoding="async"
+                  />
+                </div>
+                <div class="home-featured-copy">
+                  <p class="eyebrow">
+                    {mainRecipe.data.category} · {mainRecipe.data.prepMinutes + mainRecipe.data.cookMinutes} MIN
+                  </p>
+                  <h3>{mainRecipe.data.title}</h3>
+                  <p>{mainRecipe.data.description}</p>
+                  <p class="home-featured-meta">
+                    {mainRecipe.data.prepMinutes + mainRecipe.data.cookMinutes} min
+                    <span aria-hidden="true">·</span>
+                    {mainRecipe.data.difficulty}
+                    <span aria-hidden="true">·</span>
+                    {mainRecipe.data.servings} servings
+                  </p>
+                  <span class="home-card-link">
+                    Explore recipe <span aria-hidden="true">↗</span>
+                  </span>
+                </div>
+              </a>
+            )
+          }
+        </section>
+
+        <aside class="home-featured-aside" aria-label="More featured recipes">
+          <ul class="home-compact-list">
+            {
+              featuredRecipes.map((recipe) => (
+                <li>
+                  <a class="home-compact-story" href={`/recipes/${recipe.id}/`}>
+                    <div class="home-compact-photo">
+                      <img
+                        src={recipe.data.image || '/images/hero.png'}
+                        alt={recipe.data.imageAlt || recipe.data.title}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </div>
+                    <div class="home-compact-copy">
+                      <p class="eyebrow">
+                        {recipe.data.category} · {recipe.data.prepMinutes + recipe.data.cookMinutes} MIN
+                      </p>
+                      <h3>{recipe.data.title}</h3>
+                      <p class="home-compact-description">
+                        {featuredRecipeDescriptions[recipe.id] ?? recipe.data.description}
+                      </p>
+                      <p class="home-compact-meta">
+                        {recipe.data.difficulty} · {recipe.data.servings} servings
+                      </p>
+                    </div>
+                    <span class="home-compact-arrow" aria-hidden="true">↗</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </aside>
+      </div>
+
+      <div class="home-two-column-row home-discovery-row">
+        <section class="home-recent" aria-labelledby="recent-recipes-title">
+          <div class="home-section-heading-with-link">
+            <div>
+              <h2 id="recent-recipes-title">Recent recipes</h2>
+            </div>
+            <a class="text-link" href="/recipes/">All recipes <span aria-hidden="true">↗</span></a>
+          </div>
+          <ul class="home-compact-list">
+            {
+              recipes.slice(0, 3).map((recipe) => (
+                <li>
+                  <a class="home-compact-story" href={`/recipes/${recipe.id}/`}>
+                    <div class="home-compact-photo">
+                      <img
+                        src={recipe.data.image || '/images/hero.png'}
+                        alt={recipe.data.imageAlt || recipe.data.title}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </div>
+                    <div class="home-compact-copy">
+                      <p class="eyebrow">
+                        {recipe.data.category} · {recipe.data.prepMinutes + recipe.data.cookMinutes} MIN
+                      </p>
+                      <h3>{recipe.data.title}</h3>
+                    </div>
+                    <span class="home-compact-arrow" aria-hidden="true">↗</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+          <div class="surprise-strip" role="group" aria-label="Recipe suggestion">
+            <span class="eyebrow">NEED AN IDEA?</span>
+            <span class="surprise-copy">Get a recipe suggestion</span>
+            <button class="surprise-button" id="surprise">
+              Surprise me <span aria-hidden="true">↗</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="home-journal" aria-labelledby="journal-title">
+          <div class="home-section-heading-with-link">
+            <div>
+              <h2 id="journal-title">Journal</h2>
+            </div>
+            <a class="text-link" href="/discover/">All posts <span aria-hidden="true">↗</span></a>
+          </div>
+          <ul class="home-compact-list">
+            {
+              journalEntries.slice(0, 2).map(({ entry, href }) => (
+                <li>
+                  <a class="home-compact-story" href={href}>
+                    <div class="home-compact-photo">
+                      <img
+                        src={entry.data.image || '/images/hero.png'}
+                        alt={entry.data.imageAlt || entry.data.title}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </div>
+                    <div class="home-compact-copy">
+                      <p class="eyebrow">
+                        {entry.data.date.toLocaleDateString('en-US', {
+                          month: 'long',
+                          year: 'numeric',
+                        })}
+                      </p>
+                      <h3>{entry.data.title}</h3>
+                    </div>
+                    <span class="home-compact-arrow" aria-hidden="true">↗</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+      </div>
+
+      <Newsletter />
+    </div>
+  </div>
+
+  <script define:vars={{ urls: recipes.map((recipe) => `/recipes/${recipe.id}/`) }}>
+    document.getElementById('surprise')?.addEventListener('click', () => {
+      if (urls.length) location.href = urls[Math.floor(Math.random() * urls.length)];
+    });
+  </script>
+
+  <style is:global>
+    .home-page {
+      --home-panel: #121311;
+      --home-panel-soft: #171815;
+      --home-accent: #d7c7a6;
+      padding-bottom: clamp(56px, 8vw, 100px);
+    }
+
+    .home-content {
+      width: min(100%, 1280px);
+      padding-top: clamp(58px, 7vw, 92px);
+    }
+
+    .home-intro {
+      margin-bottom: clamp(30px, 4vw, 48px);
+    }
+
+    .home-intro .eyebrow {
+      margin-bottom: 12px;
+      color: var(--home-accent);
+    }
+
+    .home-intro h1 {
+      max-width: 1000px;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.6rem, 4.4vw, 4.25rem);
+      font-weight: 400;
+      letter-spacing: -0.035em;
+      line-height: 1.08;
+      text-wrap: balance;
+    }
+
+    .home-two-column-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.9fr);
+      gap: clamp(36px, 5vw, 68px);
+      align-items: start;
+    }
+
+    .home-feature-row {
+      margin-bottom: clamp(84px, 8vw, 108px);
+    }
+
+    .home-section-heading-with-link {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      margin-bottom: clamp(16px, 2vw, 22px);
+    }
+
+    .home-section-heading-with-link h2 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.8rem, 2.8vw, 2.45rem);
+      font-weight: 400;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+
+    .home-featured-aside .home-compact-list {
+      border-top: 0;
+    }
+
+    .home-featured-aside .home-compact-list li {
+      padding-block: 20px;
+      border-bottom-color: #6a6a60;
+    }
+
+    .home-featured-aside .home-compact-list li:first-child {
+      padding-top: 0;
+    }
+
+    .home-featured-aside .home-compact-list li:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .home-featured-aside {
+      align-self: start;
+    }
+
+    .home-featured-aside .home-compact-photo {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 2.1;
+    }
+
+    .home-featured-aside .home-compact-story {
+      width: 100%;
+      height: auto;
+      grid-template-columns: minmax(0, 1fr) 14px;
+      grid-template-rows: auto auto;
+      grid-template-areas:
+        "photo photo"
+        "copy arrow";
+      align-items: start;
+      gap: 0 12px;
+      padding-block: 0;
+    }
+
+    .home-featured-aside .home-compact-photo {
+      grid-area: photo;
+    }
+
+    .home-featured-aside .home-compact-copy {
+      grid-area: copy;
+      min-width: 0;
+      padding-top: 16px;
+    }
+
+    .home-featured-aside .home-compact-photo img {
+      display: block;
+      object-position: center;
+    }
+
+    .home-featured-aside .home-compact-arrow {
+      grid-area: arrow;
+      align-self: end;
+      padding-bottom: 3px;
+    }
+
+    .home-featured-aside .home-compact-copy .eyebrow {
+      margin-bottom: 8px;
+      font-size: 0.65rem;
+    }
+
+    .home-featured-aside .home-compact-copy > .home-compact-description {
+      margin: 8px 0;
+      color: #b6b7b0;
+      font-size: 0.88rem;
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+
+    .home-featured-aside .home-compact-copy > .home-compact-meta {
+      margin: 0;
+      color: var(--subtle);
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .home-featured-aside .home-compact-copy h3 {
+      font-size: clamp(1.3rem, 1.8vw, 1.55rem);
+      line-height: 1.15;
+    }
+
+    .home-section-heading-with-link .text-link {
+      margin-bottom: 4px;
+      font-size: 0.75rem;
+    }
+
+    .home-featured-primary {
+      display: block;
+    }
+
+    .home-featured-photo {
+      overflow: hidden;
+      aspect-ratio: 1.55;
+      background: var(--home-panel-soft);
+    }
+
+    .home-featured-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 450ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .home-featured-primary:hover img,
+    .home-compact-story:hover img {
+      transform: scale(1.035);
+    }
+
+    .home-featured-copy {
+      padding-top: clamp(20px, 2.4vw, 32px);
+    }
+
+    .home-featured-copy .eyebrow {
+      margin-bottom: 10px;
+      color: var(--home-accent);
+    }
+
+    .home-featured-copy h3 {
+      margin: 0 0 12px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2rem, 3.2vw, 3.2rem);
+      font-weight: 400;
+      letter-spacing: -0.035em;
+      line-height: 1.08;
+    }
+
+    .home-featured-copy > p:not(.eyebrow) {
+      margin-bottom: 16px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .home-featured-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 14px;
+      color: var(--subtle);
+      font-size: 0.75rem;
+    }
+
+    .home-card-link {
+      color: #e7dfd0;
+      font-size: 0.78rem;
+      font-weight: 650;
+    }
+
+    .home-compact-list {
+      padding: 0;
+      margin: 0;
+      border-top: 1px solid var(--line);
+      list-style: none;
+    }
+
+    .home-compact-list li {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .home-compact-story {
+      display: grid;
+      grid-template-columns: minmax(82px, 0.72fr) minmax(0, 1.7fr) 14px;
+      align-items: center;
+      gap: clamp(12px, 1.5vw, 20px);
+      padding: 16px 0;
+    }
+
+    .home-compact-photo {
+      overflow: hidden;
+      aspect-ratio: 1.08;
+      background: var(--home-panel-soft);
+    }
+
+    .home-compact-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 450ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .home-compact-copy .eyebrow {
+      margin: 0 0 6px;
+      color: var(--subtle);
+      font-size: 0.61rem;
+      letter-spacing: 0.12em;
+    }
+
+    .home-compact-copy h3 {
+      margin: 0 0 5px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.18;
+      transition: color 160ms ease;
+    }
+
+    .home-compact-story:hover h3 {
+      color: var(--home-accent);
+    }
+
+    .home-compact-arrow {
+      color: var(--home-accent);
+      font-size: 0.9rem;
+    }
+
+    .home-discovery-row {
+      margin-bottom: clamp(56px, 7vw, 80px);
+    }
+
+    .home-discovery-row .home-recent {
+      margin-top: 0;
+    }
+
+    .home-recent .surprise-strip {
+      gap: 12px;
+      padding: 13px 15px;
+      margin-top: 22px;
+      border-color: var(--line);
+      background: transparent;
+    }
+
+    .home-recent .surprise-strip .eyebrow {
+      margin: 0;
+      color: var(--home-accent);
+      font-size: 0.59rem;
+    }
+
+    .home-recent .surprise-copy {
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .home-recent .surprise-button {
+      min-height: 36px;
+      gap: 10px;
+      padding: 6px 10px;
+      border-color: #494a43;
+      font-size: 0.72rem;
+    }
+
+    .home-recent .surprise-button:hover {
+      border-color: var(--home-accent);
+      background: var(--home-accent);
+      color: #171713;
+    }
+
+    .home-page .newsletter {
+      position: relative;
+      gap: clamp(20px, 4vw, 54px);
+      padding: clamp(26px, 3.5vw, 44px);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--home-accent);
+      background: linear-gradient(110deg, var(--home-panel), #10110f);
+    }
+
+    .home-page .newsletter h2 {
+      margin-bottom: 8px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.15rem, 3.2vw, 3rem);
+      font-weight: 400;
+    }
+
+    .home-page .newsletter .eyebrow {
+      display: none;
+    }
+
+    .home-page .newsletter-note {
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 15px;
+      border: 1px solid #3b3c35;
+      color: var(--home-accent);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .home-page .newsletter-note::before {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--home-accent);
+      content: "";
+    }
+
+    @media (max-width: 900px) {
+      .home-two-column-row {
+        grid-template-columns: minmax(0, 1.35fr) minmax(250px, 0.9fr);
+        gap: 28px;
+      }
+
+      .home-compact-story {
+        grid-template-columns: minmax(72px, 0.7fr) minmax(0, 1.8fr) 12px;
+        gap: 12px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .home-two-column-row {
+        grid-template-columns: 1fr;
+        gap: 52px;
+      }
+
+      .home-feature-row {
+        margin-bottom: 64px;
+      }
+
+      .home-featured-aside {
+        max-width: 480px;
+        align-self: auto;
+      }
+
+      .home-featured-aside .home-compact-list {
+        display: block;
+      }
+
+      .home-discovery-row {
+        gap: 48px;
+      }
+
+      .home-featured-aside .home-compact-photo {
+        height: auto;
+        aspect-ratio: 2.1;
+      }
+
+      .home-featured-aside .home-compact-story {
+        height: auto;
+        grid-template-rows: auto auto;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .home-content {
+        padding-top: 36px;
+      }
+
+      .home-intro {
+        margin-bottom: 42px;
+      }
+
+      .home-intro h1 {
+        font-size: clamp(2.35rem, 10vw, 3.35rem);
+      }
+
+      .home-section-heading-with-link {
+        align-items: end;
+      }
+
+      .home-section-heading-with-link h2 {
+        font-size: 2rem;
+      }
+
+      .home-section-heading-with-link .text-link {
+        max-width: 100px;
+        text-align: right;
+      }
+
+      .home-featured-photo {
+        aspect-ratio: 1.3;
+      }
+
+      .home-compact-story {
+        grid-template-columns: 78px minmax(0, 1fr) 12px;
+        gap: 12px;
+        padding-block: 13px;
+      }
+
+      .home-compact-copy .eyebrow {
+        font-size: 0.56rem;
+      }
+
+      .home-compact-copy > p:not(.eyebrow) {
+        font-size: 0.72rem;
+      }
+
+      .home-recent .surprise-strip {
+        flex-wrap: wrap;
+        gap: 8px 12px;
+        padding: 12px;
+      }
+
+      .home-recent .surprise-button {
+        margin-left: auto;
+      }
+
+      .home-page .newsletter {
+        gap: 18px;
+        padding: 20px;
+      }
+
+      .home-page .newsletter-note {
+        padding: 9px 12px;
+      }
+    }
+  </style>
+</Base>

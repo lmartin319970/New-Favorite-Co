@@ -3,6 +3,7 @@ import '../styles/global.css';
 const {title='NewFavorite — Find your new favorite.',description='Explore unfamiliar ingredients, cooking techniques, and recipes worth trying.',image='/images/hero.png',type='website'}=Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const absoluteImage = new URL(image, Astro.site);
+const isHomePage = Astro.url.pathname === '/';
 ---
 <!doctype html><html lang="en"><head>
 <script is:inline async src="https://www.googletagmanager.com/gtm.js?id=GTM-W2W2FB9N"></script>
@@ -17,8 +18,42 @@ const absoluteImage = new URL(image, Astro.site);
 <meta name="twitter:card" content="summary_large_image"/><meta name="theme-color" content="#080808"/>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
 </head><body>
-<header class="site-header"><div class="wrap header-inner"><a class="brand" href="/" aria-label="NewFavorite home">newfavorite</a><nav aria-label="Main navigation"><a href="/recipes/">Recipes</a><a href="/discover/">Discover</a><a href="/about/">About</a></nav><a class="header-subscribe" href="/#newsletter">Get the newsletter</a></div></header>
+<header class:list={['site-header', {
+  'site-header--home': isHomePage,
+  'site-header--interior': !isHomePage,
+}]}>
+  <div class="wrap header-inner">
+    <a class="brand" href="/" aria-label="NewFavorite home">NewFavorite</a>
+    <nav aria-label="Main navigation"><a href="/recipes/">Recipes</a><a href="/discover/">Journal</a><a href="/about/">About</a></nav>
+    <a class="header-subscribe" href="/#newsletter">Subscribe</a>
+    <details class="mobile-menu">
+      <summary aria-label="Menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </summary>
+      <nav aria-label="Mobile navigation">
+        <a href="/recipes/">Recipes</a>
+        <a href="/discover/">Journal</a>
+        <a href="/about/">About</a>
+      </nav>
+    </details>
+  </div>
+</header>
+<script>
+  const menu = document.querySelector<HTMLDetailsElement>('.mobile-menu');
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element) || !menu) return;
+    if (!menu.contains(event.target) || event.target.closest('a')) menu.open = false;
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && menu?.open) {
+      menu.open = false;
+      menu.querySelector('summary')?.focus();
+    }
+  });
+</script>
 <main><slot/></main>
-<footer class="footer"><div class="wrap footer-inner"><div><a class="brand" href="/">newfavorite</a><p>Find something you didn't know you'd love.</p></div><div><a href="/recipes/">Recipes</a><a href="/discover/">Discover</a><a href="/about/">About</a><a href="/privacy/">Privacy</a></div><small>© {new Date().getFullYear()} NewFavorite · Independent cooking & discovery</small></div></footer>
+<footer class="footer"><div class="wrap footer-inner"><div><a class="brand" href="/">NewFavorite</a><p>Find your next favorite dish.</p></div><div><a href="/recipes/">Recipes</a><a href="/discover/">Journal</a><a href="/about/">About</a><a href="/privacy/">Privacy</a></div><small>© {new Date().getFullYear()} NewFavorite · Independent cooking & discovery</small></div></footer>
 <script>document.addEventListener('click',e=>{const el=(e.target as HTMLElement).closest('[data-track]');if(el && typeof (window as any).gtag==='function')(window as any).gtag('event',el.getAttribute('data-track'),{item_id:el.getAttribute('data-item')||''})})</script>
 </body></html>

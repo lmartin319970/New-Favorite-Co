@@ -2,7 +2,7 @@
 title: Notes from the Kitchen
 description: Why NewFavorite makes room for experiments as well as polished recipes.
 date: 2026-11-04
-image: /images/sliders.png
+image: /images/sliders.JPEG
 imageAlt: Casual homemade sliders
 featured: true
 tags: [behind the scenes, cooking]

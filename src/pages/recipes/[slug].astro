@@ -23,8 +23,9 @@ const schema = {
   datePublished: d.date.toISOString().slice(0, 10),
   prepTime: `PT${d.prepMinutes}M`,
   cookTime: `PT${d.cookMinutes}M`,
+  totalTime: `PT${d.prepMinutes + d.cookMinutes}M`,
   recipeYield: `${d.servings} servings`,
-  recipeIngredient: d.ingredients.map((i: any) => `${i.amount} ${i.name}`),
+  recipeIngredient: d.ingredients.map((i: any) => `${i.amount} ${i.name}`.trim()),
   recipeInstructions: d.instructions.map((text: string) => ({
     '@type': 'HowToStep',
     text,
@@ -34,21 +35,20 @@ const schema = {
 ---
 <Base title={`${d.title} | NewFavorite`} description={d.description} image={d.image || '/images/hero.png'} type="article">
   <script type="application/ld+json" set:html={JSON.stringify(schema)} />
-  <article class="wrap article">
+  <article class="wrap article recipe-page">
     <a class="back-link" href="/recipes/">← All recipes</a>
     <p class="eyebrow">{d.category} · {d.difficulty}</p>
     <h1>{d.title}</h1>
+    <p class="eyebrow">Published <time datetime={d.date.toISOString().slice(0, 10)}>{d.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</time></p>
     <p class="lede">{d.description}</p>
     <img class="article-hero" src={d.image || '/images/hero.png'} alt={d.imageAlt || d.title} fetchpriority="high" />
     <div class="recipe-meta">
-      <span><strong>{d.prepMinutes}</strong> min prep</span>
-      <span><strong>{d.cookMinutes}</strong> min cook</span>
+      <span><strong>{d.prepMinutes + d.cookMinutes}</strong> min total</span>
       <span><strong>{d.servings}</strong> servings</span>
-      <a href="#recipe">Jump to recipe ↓</a>
     </div>
     {d.discovery && <aside class="discovery-note"><p class="eyebrow">WHAT'S NEW HERE</p><p>{d.discovery}</p></aside>}
-    <div class="prose"><Content /></div>
-    <div id="recipe" class="recipe-panel">
+    <div id={d.recipeInBody ? 'recipe' : undefined} class="prose recipe-content"><Content /></div>
+    {!d.recipeInBody && <div id="recipe" class="recipe-panel">
       <h2>Make it yourself</h2>
       <div class="recipe-columns">
         <section>
@@ -62,7 +62,7 @@ const schema = {
           <ol class="steps">{d.instructions.map((step: string) => <li>{step}</li>)}</ol>
         </section>
       </div>
-    </div>
+    </div>}
     <Engagement slug={entry.id} title={d.title} />
   </article>
 </Base>
