@@ -129,9 +129,9 @@ instructions:
 ---
 **Recipe background, about the recipe, and pre-recipe yapping:** [Background](/journal/chicken-and-cornbread-stuffing-background/). I'd encourage a quick read; otherwise, recipe below!
 
-## Ingredients
+## Roasted Chicken
 
-### Roasted Chicken
+### Ingredients
 
 #### Chicken & Wet Brine
 
@@ -167,7 +167,33 @@ instructions:
 
 - 3 tbsp **Butter**
 
-### Cornbread Stuffing
+### Instructions
+
+#### Chicken Brine
+
+1. Add chicken, vinegar, salt, and water to bowl. Cover and place in fridge for 4-8 hours.
+
+#### Roasted Chicken
+
+1. Preheat oven to 425°F.
+
+1. Combine all seasoning ingredients listed above into a paste, adding more spices or olive oil as necessary.
+
+1. Take chicken out of the brine and pat dry.
+
+1. Rub seasoning paste on chicken, fully coating it, including under the skin when feasible.
+
+1. Place on greased wire rack and baking pan; bake at 425 for 40-45 minutes.
+
+1. Combine melted butter, honey, and a pinch of salt. Glaze chicken with mixture, and bake for 5 more minutes.
+
+1. Ensure chicken reaches 165°F before removing.
+
+1. Rest for 10 minutes.
+
+## Cornbread Stuffing
+
+### Ingredients
 
 #### Buttermilk Cornbread
 
@@ -207,33 +233,7 @@ instructions:
 
 - 1 ½ - 2 cups **Low sodium chicken broth**
 
-### Cranberry Sauce
-
-- 12 oz **fresh cranberries**
-
-- ¾ cup **white sugar**
-
-- 1/3 cup **brown sugar**
-
-- 2 **Oranges**, juiced and zested
-
-- ½ cup **water**
-
-- ½ tsp **Cinnamon**
-
-- 2 tbsp **Butter**
-
-- 2 tbsp **Vanilla Bean Paste**
-
-- ½ tsp **Salt**, adjust to taste
-
-## Instructions
-
-### Night Before / In advance
-
-#### Chicken Brine
-
-1. Add chicken, vinegar, salt, and water to bowl. Cover and place in fridge for 4-8 hours.
+### Instructions
 
 #### Buttermilk Cornbread
 
@@ -248,40 +248,6 @@ instructions:
 1. Bake at 400°F for 20-25 minutes. Ensure a center-dipped fork comes out dry. For stuffing, better on the drier side.
 
 1. Cover and refrigerate (if being extra safe) until ready to make stuffing.
-
-#### Cranberry Sauce
-
-1. Add water, orange juice, brown sugar and white sugar to medium saucepan. Heat to light simmer.
-
-1. Add cranberries to saucepan for 10-15 minutes, or until most cranberries have burst. As they cook down, use spatula to crush cranberries to desired consistency.
-
-1. Once cooked down and desired consistency is reached, take off heat and add vanilla bean paste, salt, cinnamon and orange zest. Be very careful to not use any pith (white) of the orange.
-
-1. While cooling, place cold butter in sauce and quickly mix it around. This ensures a restaurant-quality gloss.
-
-1. Taste the sauce; if needed, add more sugar. Cranberries tend to be slightly bitter until sufficiently sweetened.
-
-1. Store in fridge until ready to serve.
-
-### Day Of
-
-#### Roasted Chicken
-
-1. Preheat oven to 425°F.
-
-1. Combine all seasoning ingredients listed above into a paste, adding more spices or olive oil as necessary.
-
-1. Take chicken out of the brine and pat dry.
-
-1. Rub seasoning paste on chicken, fully coating it, including under the skin when feasible.
-
-1. Place on greased wire rack and baking pan; bake at 425 for 40-45 minutes.
-
-1. Combine melted butter, honey, and a pinch of salt. Glaze chicken with mixture, and bake for 5 more minutes.
-
-1. Ensure chicken reaches 165°F before removing.
-
-1. Rest for 10 minutes.
 
 #### Cornbread Stuffing
 
@@ -303,6 +269,43 @@ instructions:
 
    - If the oven is still at 425, you can bake for 15 minutes covered, and 10 minutes uncovered instead
 
+
 1. Rest for 5-10 minutes before serving.
 
 1. Serve and top with fresh thyme if you have it. Enjoy!
+
+## Cranberry Sauce
+
+### Ingredients
+
+- 12 oz **fresh cranberries**
+
+- ¾ cup **white sugar**
+
+- 1/3 cup **brown sugar**
+
+- 2 **Oranges**, juiced and zested
+
+- ½ cup **water**
+
+- ½ tsp **Cinnamon**
+
+- 2 tbsp **Butter**
+
+- 1 tbsp **Vanilla Bean Paste**
+
+- ½ tsp **Salt**, adjust to taste
+
+### Instructions
+
+1. Add water, orange juice, brown sugar and white sugar to medium saucepan. Heat to light simmer.
+
+1. Add cranberries to saucepan for 10-15 minutes, or until most cranberries have burst. As they cook down, use spatula to crush cranberries to desired consistency.
+
+1. Once cooked down and desired consistency is reached, take off heat and add vanilla bean paste, salt, cinnamon and orange zest. Be very careful to not use any pith (white) of the orange.
+
+1. While cooling, place cold butter in sauce and quickly mix it around. This ensures a restaurant-quality gloss.
+
+1. Taste the sauce; if needed, add more sugar. Cranberries tend to be slightly bitter until sufficiently sweetened.
+
+1. Store in fridge until ready to serve.
